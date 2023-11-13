@@ -67,17 +67,27 @@ function App() {
 
   const renderCitySuggestions = () => {
     return (
-      <div className='suggestion-con'>
-        <ul className="suggestion-list">
+      <div className="suggestion-con">
+        <select
+          className="suggestion-dropdown"
+          size="5"
+          onChange={(e) => {
+            const selectedCity = citySuggestions.find((city) => city.id.toString() === e.target.value);
+            if (selectedCity) {
+              handleSuggestionClick(selectedCity);
+            }
+          }}
+        >
           {citySuggestions.map((city) => (
-            <li key={city.id} onClick={() => handleSuggestionClick(city)} className='suggestion-city my-1'>
+            <option key={city.id} value={city.id} className="suggestion-city">
               {city.name}, {city.sys.country}
-            </li>
+            </option>
           ))}
-        </ul>
+        </select>
       </div>
     );
   };
+  
 
   return (
     <div className="main">
