@@ -1,31 +1,59 @@
-*{
+* {
   border: none;
   margin: 0;
   padding: 0;
 }
 
-.main{
+.main {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color:#dcf0f0;
+  background-color: #dcf0f0;
 }
 
-.card{
+.card {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color:#f0f0f0;
+  background-color: #f0f0f0;
 }
 
-.cloud--i{
+.cloud--i {
   font-size: 50px;
 }
 
-.main--content p{
+.main--content p {
   margin: 0;
   font-size: 3rem;
   font-weight: 500;
+}
+
+.suggestion-con{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.suggestion-list{
+  display: flex;
+  flex-flow: column;
+  background-color: #FFFF;
+  margin-top: -10px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 0.2rem;
+  width: 95%;
+}
+
+.suggestion-city {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.suggestion-city:hover{
+  background-color: #28242c;
+  color: white;
 }
