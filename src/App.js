@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const apiKey = "4b5cc7ed38fc52834d5e657f6a20eb34";
+const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = 'https://api.openweathermap.org/data/2.5/find';
 
-async function getCityData(city) {
+async function getCityData(query) {
   try {
-    const response = await fetch(`${apiUrl}?q=${city}&appid=${apiKey}&units=metric`);
+    const response = await fetch(`${apiUrl}?q=${query}&appid=${apiKey}&units=metric`);
     if (response.ok) {
       const data = await response.json();
-      return data.list;
+      return data.list.filter((city) => city.name.toLowerCase().startsWith(query.toLowerCase()));
     } else {
       console.error('Failed to fetch city data');
       return null;
@@ -25,23 +25,28 @@ function App() {
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
   const [unit, setUnit] = useState('c');
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
+  useEffect(() => {
+    const fetchCitySuggestions = async () => {
+      if (loc.trim() !== '') {
+        const data = await getCityData(loc);
+        if (data) {
+          setCitySuggestions(data);
+        }
+      }
+    };
+
+    fetchCitySuggestions();
+  }, [loc]);
 
   const toggleUnit = () => {
-    setUnit(unit === 'c' ? 'f' : 'c');
+    setUnit((prevUnit) => (prevUnit === 'c' ? 'f' : 'c'));
   };
 
   const temperatureUnit = unit === 'c' ? '°C' : '°F';
 
-  const temp = weatherData ? (unit === 'c' ? weatherData.main.temp : (weatherData.main.temp * 9 / 5 + 32)) : null;
-
-  const fetchCitySuggestions = async () => {
-    if (loc.trim() !== '') {
-      const data = await getCityData(loc);
-      if (data) {
-        setCitySuggestions(data);
-      }
-    }
-  };
+  const temp = weatherData ? (unit === 'c' ? weatherData.main.temp : weatherData.main.temp * 1.8 + 32) : null;
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -53,6 +58,25 @@ function App() {
     setLoc(city.name);
     setWeatherData(city);
     setCitySuggestions([]);
+    setShowSuggestions(false); // Hide the dropdown when a suggestion is clicked
+  };
+
+  const renderCitySuggestions = () => {
+    if (!showSuggestions || citySuggestions.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="suggestion-con">
+        <select className="suggestion-list" size="5" onChange={(e) => handleSuggestionClick(citySuggestions[e.target.selectedIndex])}>
+          {citySuggestions.map((city, index) => (
+            <option key={city.id} value={index} className='suggestion-city'>
+              {city.name}, {city.sys.country}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
   };
 
   const fetchWeatherData = async () => {
@@ -64,30 +88,6 @@ function App() {
       }
     }
   };
-
-  const renderCitySuggestions = () => {
-    return (
-      <div className="suggestion-con">
-        <select
-          className="suggestion-dropdown"
-          size="5"
-          onChange={(e) => {
-            const selectedCity = citySuggestions.find((city) => city.id.toString() === e.target.value);
-            if (selectedCity) {
-              handleSuggestionClick(selectedCity);
-            }
-          }}
-        >
-          {citySuggestions.map((city) => (
-            <option key={city.id} value={city.id} className="suggestion-city">
-              {city.name}, {city.sys.country}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
-  
 
   return (
     <div className="main">
@@ -101,7 +101,7 @@ function App() {
               value={loc}
               onChange={(e) => {
                 setLoc(e.target.value);
-                fetchCitySuggestions();
+                setShowSuggestions(true);
               }}
               onKeyDown={handleKeyPress}
             />
@@ -109,7 +109,7 @@ function App() {
               <i className="fas fa-search"></i>
             </span>
           </p>
-          {citySuggestions.length > 0 && renderCitySuggestions()}
+          {renderCitySuggestions()}
         </div>
         <div className="main--content mt-4">
           <i className="fas fa-cloud cloud--i"></i>
@@ -131,7 +131,7 @@ function App() {
             type="checkbox"
             role="switch"
             id="flexSwitchCheckDefault"
-            style={{ backgroundColor: "wheat" }}
+            style={{ backgroundColor: 'wheat' }}
             checked={unit === 'f'}
             onChange={toggleUnit}
           />
