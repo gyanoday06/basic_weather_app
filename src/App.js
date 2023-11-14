@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+import cityData from './data.json'
+
 const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = 'https://api.openweathermap.org/data/2.5/find';
 
@@ -54,23 +56,28 @@ function App() {
     }
   };
 
-  const handleSuggestionClick = (city) => {
-    setLoc(city.name);
-    setWeatherData(city);
-    setCitySuggestions([]);
-    setShowSuggestions(false); // Hide the dropdown when a suggestion is clicked
+  const handleSuggestionClick = async (selectedCityName) => {
+    setLoc(selectedCityName);
+    setShowSuggestions(false);
+  
+    // Fetch weather data based on the selected city name
+    const data = await getCityData(selectedCityName);
+    if (data && data.length > 0) {
+      setWeatherData(data[0]);
+      setCitySuggestions([]);
+    }
   };
-
+  
   const renderCitySuggestions = () => {
-    if (!showSuggestions || citySuggestions.length === 0) {
+    if (!showSuggestions) {
       return null;
     }
-
+  
     return (
       <div className="suggestion-con">
-        <select className="suggestion-list" size="5" onChange={(e) => handleSuggestionClick(citySuggestions[e.target.selectedIndex])}>
-          {citySuggestions.map((city, index) => (
-            <option key={city.id} value={index} className='suggestion-city'>
+        <select className="suggestion-list" size="5" onChange={(e) => handleSuggestionClick(cityData.list[e.target.selectedIndex].name)}>
+          {cityData.list.map((city) => (
+            <option key={city.id} value={city.id} className='suggestion-city'>
               {city.name}, {city.sys.country}
             </option>
           ))}
@@ -109,7 +116,7 @@ function App() {
               <i className="fas fa-search"></i>
             </span>
           </p>
-          {renderCitySuggestions()}
+          {/* {renderCitySuggestions()} */}
         </div>
         <div className="main--content mt-4">
           <i className="fas fa-cloud cloud--i"></i>

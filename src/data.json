@@ -1,0 +1,40 @@
+{
+    "list": [
+      {
+        "id": 1,
+        "name": "London",
+        "sys": {
+          "country": "GB"
+        }
+      },
+      {
+        "id": 2,
+        "name": "New York",
+        "sys": {
+          "country": "US"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Tokyo",
+        "sys": {
+          "country": "JP"
+        }
+      },
+      {
+        "id": 4,
+        "name": "Paris",
+        "sys": {
+          "country": "FR"
+        }
+      },
+      {
+        "id": 5,
+        "name": "Sydney",
+        "sys": {
+          "country": "AU"
+        }
+      }
+    ]
+  }
+  
