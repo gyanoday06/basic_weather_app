@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-import cityData from './data.json'
+import cityData from './data.json';
 
 const apiKey = process.env.REACT_APP_API_KEY;
-const apiUrl = 'https://api.openweathermap.org/data/2.5/find';
+const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
 async function getCityData(query) {
   try {
-    const response = await fetch(`${apiUrl}?q=${query}&appid=${apiKey}&units=metric`);
+    const response = await fetch(`${apiUrl}?q=${encodeURIComponent(query)}&appid=${apiKey}&units=metric`);
     if (response.ok) {
       const data = await response.json();
-      return data.list.filter((city) => city.name.toLowerCase().startsWith(query.toLowerCase()));
+      console.log('API Response:', data);
+      return data;
+    } else if (response.status === 404) {
+      console.error('City not found.');
+      return null;
     } else {
-      console.error('Failed to fetch city data');
+      const errorMessage = await response.text();
+      console.error('Failed to fetch city data. Error:', errorMessage);
       return null;
     }
   } catch (error) {
@@ -34,7 +39,7 @@ function App() {
       if (loc.trim() !== '') {
         const data = await getCityData(loc);
         if (data) {
-          setCitySuggestions(data);
+          setCitySuggestions([data]);
         }
       }
     };
@@ -59,24 +64,24 @@ function App() {
   const handleSuggestionClick = async (selectedCityName) => {
     setLoc(selectedCityName);
     setShowSuggestions(false);
-  
+
     const data = await getCityData(selectedCityName);
-    if (data && data.length > 0) {
-      setWeatherData(data[0]);
+    if (data) {
+      setWeatherData(data);
       setCitySuggestions([]);
     }
   };
-  
+
   const renderCitySuggestions = () => {
     if (!showSuggestions) {
       return null;
     }
-  
+
     return (
       <div className="suggestion-con">
-        <select className="suggestion-list" size="5" onChange={(e) => handleSuggestionClick(cityData.list[e.target.selectedIndex].name)}>
-          {cityData.list.map((city) => (
-            <option key={city.id} value={city.id} className='suggestion-city'>
+        <select className="suggestion-list" size="5" onChange={(e) => handleSuggestionClick(e.target.value)}>
+          {citySuggestions.map((city) => (
+            <option key={city.id} value={city.name} className='suggestion-city'>
               {city.name}, {city.sys.country}
             </option>
           ))}
@@ -88,8 +93,8 @@ function App() {
   const fetchWeatherData = async () => {
     if (loc.trim() !== '') {
       const data = await getCityData(loc);
-      if (data && data.length > 0) {
-        setWeatherData(data[0]);
+      if (data) {
+        setWeatherData(data);
         setCitySuggestions([]);
       }
     }
@@ -115,7 +120,7 @@ function App() {
               <i className="fas fa-search"></i>
             </span>
           </p>
-          {/* {renderCitySuggestions()}  */}
+          {/* {renderCitySuggestions()} */}
         </div>
         <div className="main--content mt-4">
           <i className="fas fa-cloud cloud--i"></i>
