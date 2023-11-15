@@ -60,7 +60,6 @@ function App() {
     setLoc(selectedCityName);
     setShowSuggestions(false);
   
-    // Fetch weather data based on the selected city name
     const data = await getCityData(selectedCityName);
     if (data && data.length > 0) {
       setWeatherData(data[0]);
@@ -116,7 +115,7 @@ function App() {
               <i className="fas fa-search"></i>
             </span>
           </p>
-          {/* {renderCitySuggestions()} */} 
+          {renderCitySuggestions()} 
         </div>
         <div className="main--content mt-4">
           <i className="fas fa-cloud cloud--i"></i>
