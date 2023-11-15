@@ -115,7 +115,7 @@ function App() {
               <i className="fas fa-search"></i>
             </span>
           </p>
-          {renderCitySuggestions()} 
+          {/* {renderCitySuggestions()}  */}
         </div>
         <div className="main--content mt-4">
           <i className="fas fa-cloud cloud--i"></i>
